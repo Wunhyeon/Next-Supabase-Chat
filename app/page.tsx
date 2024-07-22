@@ -1,4 +1,5 @@
 import ChatHeader from "@/components/ChatHeader";
+import { ChatInput } from "@/components/ChatInput";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import InitUser from "@/lib/store/InitUser";
@@ -45,9 +46,7 @@ const page = async () => {
               })}
             </div>
           </div>
-          <div className="p-5">
-            <Input placeholder="send message" />
-          </div>
+          <ChatInput />
         </div>
       </div>
       <InitUser user={user} />
