@@ -1,4 +1,4 @@
-import { IMessage } from "@/lib/store/messages";
+import { IMessage, useMessage } from "@/lib/store/messages";
 import Image from "next/image";
 import React from "react";
 import {
@@ -12,7 +12,10 @@ import {
 import { Ellipsis } from "lucide-react";
 import { useUser } from "@/lib/store/user";
 
-const MessageMenu = () => {
+const MessageMenu = ({ message }: { message: IMessage }) => {
+  // 1. props로 메세지를 받는다.
+  const setActionMessage = useMessage((state) => state.setActionMessage); // 2. setActionMessage를 state에서 받아온다.
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -22,7 +25,15 @@ const MessageMenu = () => {
         <DropdownMenuLabel>Action</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem>Edit</DropdownMenuItem>
-        <DropdownMenuItem>Delete</DropdownMenuItem>
+        <DropdownMenuItem
+          // 요기
+          onClick={() => {
+            document.getElementById("trigger-delete")?.click();
+            setActionMessage(message); // 3. setActionMessage로 actionMessage에 props로 받아온 메세지를 설정해준다.
+          }}
+        >
+          Delete
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -51,8 +62,8 @@ const Message = ({ message }: { message: IMessage }) => {
               {new Date(message.created_at).toDateString()}
             </h1>
           </div>
-          {/* 현재 로그인되어있는 유저와 메세지 작성자 유저의 아이디가 같을때만 수정메뉴가 보일 수 있도록. */}
-          {message.users?.id === user?.id && <MessageMenu />}
+          {/* props로 메세지를 넘겨준다. */}
+          {message.users?.id === user?.id && <MessageMenu message={message} />}
         </div>
         <p className="text-gray-300">{message.text}</p>
       </div>
