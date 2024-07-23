@@ -23,20 +23,6 @@ export const ChatInput = () => {
       return;
     }
 
-    // optimistic update를 해줄 message
-    // const newMessage = {
-    //   id: uuidv4(),
-    //   text,
-    //   user_id: user?.id,
-    //   is_edit: false,
-    //   created_at: new Date().toISOString(),
-    //   users: {
-    //     id: user?.id,
-    //     avatar_url: user?.user_metadata.avatar_url,
-    //     created_at: new Date().toISOString(),
-    //     display_name: user?.user_metadata.user_name,
-    //   },
-    // };
     const newMessage = {
       id: uuidv4(),
       text,
@@ -44,10 +30,6 @@ export const ChatInput = () => {
       is_edit: false,
       // created_at: new Date().toISOString(),
     };
-
-    // const { data, error, status } = await supabase
-    //   .from("messages")
-    //   .insert({ text });
 
     const { data, error, status } = await supabase
       .from("messages")
@@ -80,8 +62,9 @@ export const ChatInput = () => {
       <Input
         placeholder="send message"
         onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            // enter 키를 누르면 메세지가 전송되도록
+          if (e.key === "Enter" && e.nativeEvent.isComposing === false) {
+            // enter 키를 누르면 메세지가 전송되도록.
+            // e.nativeEvent.isComposing === false - 한글 두번 입력현상 방지
             handleSendMessage(e.currentTarget.value);
             e.currentTarget.value = ""; // 메세지를 전송하고 나서 칸을 비워준다.
           }
