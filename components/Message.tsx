@@ -24,9 +24,15 @@ const MessageMenu = ({ message }: { message: IMessage }) => {
       <DropdownMenuContent>
         <DropdownMenuLabel>Action</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Edit</DropdownMenuItem>
         <DropdownMenuItem
-          // 요기
+          onClick={() => {
+            document.getElementById("trigger-edit")?.click();
+            setActionMessage(message);
+          }}
+        >
+          Edit
+        </DropdownMenuItem>
+        <DropdownMenuItem
           onClick={() => {
             document.getElementById("trigger-delete")?.click();
             setActionMessage(message); // 3. setActionMessage로 actionMessage에 props로 받아온 메세지를 설정해준다.
@@ -61,6 +67,12 @@ const Message = ({ message }: { message: IMessage }) => {
             <h1 className="text-sm text-gray-400">
               {new Date(message.created_at).toDateString()}
             </h1>
+            {
+              // 요기!! 수정되었다고 표시
+              message.is_edit && (
+                <h1 className="text-sm text-gray-400">edited</h1>
+              )
+            }
           </div>
           {/* props로 메세지를 넘겨준다. */}
           {message.users?.id === user?.id && <MessageMenu message={message} />}

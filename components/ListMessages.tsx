@@ -3,7 +3,7 @@
 import { useMessage } from "@/lib/store/messages";
 import React from "react";
 import Message from "./Message";
-import { DeleteAlert } from "./MessageActions";
+import { DeleteAlert, EditAlert } from "./MessageActions";
 
 const ListMessages = () => {
   const messages = useMessage((state) => state.messages); // zustand에 전역으로 저장된 state를 불러옴.
@@ -17,6 +17,7 @@ const ListMessages = () => {
         })}
       </div>
       <DeleteAlert />
+      <EditAlert />
     </div>
   );
 };
