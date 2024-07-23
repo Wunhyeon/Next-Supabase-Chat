@@ -12,7 +12,8 @@ export const ChatInput = () => {
   const supabase = createClient();
 
   const user = useUser((state) => state.user); // user 정보를 불러온다.
-  const addMessage = useMessage((state) => state.addMessage); // addMessage function을 불러온다.
+  const { addMessage, optimisticIds } = useMessage((state) => state); // addMessage function을 불러온다.
+  const setOptimisticIDs = useMessage((state) => state.setOptimisticIds);
 
   // 메세지 전송 펑션
   const handleSendMessage = async (text: string) => {
@@ -23,12 +24,38 @@ export const ChatInput = () => {
     }
 
     // optimistic update를 해줄 message
+    // const newMessage = {
+    //   id: uuidv4(),
+    //   text,
+    //   user_id: user?.id,
+    //   is_edit: false,
+    //   created_at: new Date().toISOString(),
+    //   users: {
+    //     id: user?.id,
+    //     avatar_url: user?.user_metadata.avatar_url,
+    //     created_at: new Date().toISOString(),
+    //     display_name: user?.user_metadata.user_name,
+    //   },
+    // };
     const newMessage = {
       id: uuidv4(),
       text,
-      user_id: user?.id,
+      // user_id: user?.id,
       is_edit: false,
-      created_at: new Date().toISOString(),
+      // created_at: new Date().toISOString(),
+    };
+
+    // const { data, error, status } = await supabase
+    //   .from("messages")
+    //   .insert({ text });
+
+    const { data, error, status } = await supabase
+      .from("messages")
+      .insert(newMessage);
+
+    // optimistic update에 사용될 newMessage객체
+    const newMessageForOpt = {
+      ...newMessage,
       users: {
         id: user?.id,
         avatar_url: user?.user_metadata.avatar_url,
@@ -37,14 +64,14 @@ export const ChatInput = () => {
       },
     };
 
-    const { data, error, status } = await supabase
-      .from("messages")
-      .insert({ text });
+    console.log("newMessage.id : ", newMessage.id);
 
-    addMessage(newMessage as IMessage); // 불러온 addMessage 펑션 사용하기
+    addMessage(newMessageForOpt as IMessage); // 불러온 addMessage 펑션 사용하기
+    setOptimisticIDs(newMessageForOpt.id);
 
     if (error) {
       toast.error(error.message);
+      console.log(error);
     }
   };
 
