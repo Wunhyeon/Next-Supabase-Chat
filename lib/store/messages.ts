@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { LIMIT_MESSAGE } from "../constant";
 
 export type IMessage = {
   created_at: string;
@@ -26,6 +27,9 @@ interface MessageState {
   optimisticUpdateMessage: (message: IMessage) => void;
   optimisticIds: string[];
   setOptimisticIds: (id: string) => void;
+  page: number;
+  setMessages: (messages: IMessage[]) => void;
+  hasMore: boolean; // LoadMore버튼으로 더 가져올 데이터가 있는지.
 }
 
 export const useMessage = create<MessageState>()((set) => ({
@@ -57,4 +61,12 @@ export const useMessage = create<MessageState>()((set) => ({
   optimisticIds: [],
   setOptimisticIds: (id: string) =>
     set((state) => ({ optimisticIds: [...state.optimisticIds, id] })),
+  page: 1,
+  setMessages: (messages) =>
+    set((state) => ({
+      messages: [...messages, ...state.messages],
+      page: state.page + 1,
+      hasMore: messages.length >= LIMIT_MESSAGE, // 새로 받아온 messages가 LIMIT_MESSAGE보다 많거나 같은지. 예를들어 LIMIT_MESSAGE가 10이고 이번에 새로 받아온 messages가 10이라면 더 가져올 데이터가 있다는 뜻이지만, LIMIT_MESSAGE가 10인데 이번에 새로 받아온 messages가 5라면 더 가져올 데이터가 없다는 뜻이다.
+    })),
+  hasMore: true, // LoadMore버튼으로 더 가져올 데이터가 있는지.
 }));

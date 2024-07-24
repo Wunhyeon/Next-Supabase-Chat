@@ -7,6 +7,7 @@ import { DeleteAlert, EditAlert } from "./MessageActions";
 import { createClient } from "@/utils/supabase/client";
 import { toast } from "sonner";
 import { ArrowDown } from "lucide-react";
+import LoadMoreMessages from "./LoadMoreMessages";
 
 const ListMessages = () => {
   // const { messages, addMessage, optimisticIds } = useMessage((state) => state); // zustand에 전역으로 저장된 state를 불러옴. // addMessage는 예전에 만든 메세지를 추가하는 메서드
@@ -112,11 +113,13 @@ const ListMessages = () => {
   return (
     <>
       <div
-        className="flex-1  flex flex-col p-5 h-full overflow-y-auto"
+        className="flex-1  flex flex-col p-5 h-full overflow-y-auto gap-5"
         ref={scrollRef}
         onScroll={handleOnScroll}
       >
-        <div className="flex-1"></div>
+        <div className="flex-1">
+          <LoadMoreMessages />
+        </div>
         <div className="space-y-7">
           {messages.map((value, idx) => {
             return <Message key={idx} message={value} />;
