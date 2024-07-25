@@ -1,3 +1,4 @@
+// components/ChatHeader.tsx
 "use client";
 
 import React from "react";
@@ -6,9 +7,11 @@ import { createClient } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation"; // 주의할 점. next/navigation에서 임포트한다.
 import ChatPresence from "./ChatPresence";
+import { useUser } from "@/lib/store/user";
 
 const ChatHeader = ({ user }: { user: User | null }) => {
   const router = useRouter();
+  const setUser = useUser((state) => state.setUser);
 
   // props로 UserResponse를 받는다.
   const handleLoginWithGithub = () => {
@@ -25,6 +28,8 @@ const ChatHeader = ({ user }: { user: User | null }) => {
     const supabase = createClient();
     await supabase.auth.signOut();
     // const { error } = await supabase.auth.signOut();
+    user = null;
+    setUser(null);
     router.refresh();
   };
 

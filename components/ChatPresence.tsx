@@ -26,8 +26,12 @@ const ChatPresence = () => {
         const userIds = [];
         for (const item in newState) {
           const userId = newState[item][0].user_id;
+          if (!userId) {
+            continue;
+          }
           userIds.push(userId);
         }
+        console.log("userIDs : ", userIds);
 
         setOnlineUsers(new Set(userIds).size);
       })
