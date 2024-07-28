@@ -44,9 +44,10 @@ export const ChatInput = () => {
         created_at: new Date().toISOString(),
         display_name: user?.user_metadata.user_name,
       },
+      created_at: new Date().toISOString(),
     };
 
-    console.log("newMessage.id : ", newMessage.id);
+    // console.log("newMessage.createdAt :  : ", newMessage.created);
 
     addMessage(newMessageForOpt as IMessage); // 불러온 addMessage 펑션 사용하기
     setOptimisticIDs(newMessageForOpt.id);
