@@ -1,3 +1,5 @@
+// components/ListMessages.tsx
+
 "use client";
 
 import { IMessage, useMessage } from "@/lib/store/messages";
@@ -29,51 +31,21 @@ const ListMessages = () => {
     console.log("messages : ", messages);
     const channel = supabase
       .channel("chat-room") // room id를 넣어준다. 여기서는 채팅방이 하나만 있으므로 chat-room으로 전부 통일시킨거다.
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "messages" },
-        async (payload) => {
-          console.log("Change received!", payload);
-
-          if (optimisticIds.includes(payload.new.id)) {
-            return;
-          }
-
-          // 받아온 페이로드로 user 정보를 가져오기
-          const { error, data } = await supabase
-            .from("users")
-            .select("*")
-            .eq("id", payload.new.user_id)
-            .single();
-
-          if (error) {
-            toast.error(error.message);
-          } else {
-            const newMessage = {
-              ...payload.new,
-              users: data,
-            };
-            addMessage(newMessage as IMessage);
-          }
-          setNotification((current) => current + 1);
+      .on("broadcast", { event: "test" }, (payload) => {
+        if (optimisticIds.includes(payload.payload.message.id)) {
+          return;
         }
-      )
-      .on(
-        "postgres_changes",
-        { event: "DELETE", schema: "public", table: "messages" },
-        (payload) => {
-          console.log("Change received!", payload);
-          optimisticDeleteMessage(payload.old.id);
-        }
-      )
-      .on(
-        "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "messages" },
-        (payload) => {
-          console.log("Change received!", payload);
-          optimisticUpdateMessage(payload.new as IMessage);
-        }
-      )
+        addMessage(payload.payload.message);
+        setNotification((current) => current + 1);
+      })
+      .on("broadcast", { event: "edit" }, (payload) => {
+        console.log("payload : ", payload);
+        optimisticUpdateMessage(payload.payload.message);
+      })
+      .on("broadcast", { event: "delete" }, (payload) => {
+        console.log("payload : ", payload);
+        optimisticDeleteMessage(payload.payload.id);
+      })
       .subscribe();
 
     return () => {

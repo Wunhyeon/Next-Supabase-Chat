@@ -1,3 +1,5 @@
+// components/MessageActions.tsx
+
 import React, { useRef } from "react";
 import {
   AlertDialog,
@@ -32,16 +34,20 @@ export function EditAlert() {
     (state) => state.optimisticUpdateMessage
   );
   const inputRef = useRef() as React.MutableRefObject<HTMLInputElement>;
+  const supabase = createClient();
+  const channel = supabase.channel("chat-room");
 
   const handleEdit = async () => {
-    const supabase = createClient();
     const text = inputRef.current.value.trim();
     if (text) {
-      optimisticUpdateMessage({
+      const edittedMessage = {
         ...actionMessage,
         text,
         is_edit: true,
-      } as IMessage);
+      } as IMessage;
+
+      optimisticUpdateMessage(edittedMessage);
+
       const { error } = await supabase
         .from("messages")
         .update({ text, is_edit: true })
@@ -52,6 +58,12 @@ export function EditAlert() {
       } else {
         toast.success("Successfully update a message");
       }
+
+      channel.send({
+        type: "broadcast",
+        event: "edit", // event 이름을 edit으로 해준다.
+        payload: { message: edittedMessage },
+      });
 
       document.getElementById("trigger-edit")?.click();
     } else {
@@ -90,10 +102,16 @@ export function DeleteAlert() {
   const optimisticDeleteMessage = useMessage(
     (state) => state.optimisticDeleteMessage
   );
+  const supabase = createClient();
+  const channel = supabase.channel("chat-room");
 
   const handleDeleteMessage = async () => {
-    const supabase = createClient();
     optimisticDeleteMessage(actionMessage?.id!);
+    channel.send({
+      type: "broadcast",
+      event: "delete",
+      payload: { id: actionMessage?.id },
+    });
 
     const { data, error } = await supabase
       .from("messages")

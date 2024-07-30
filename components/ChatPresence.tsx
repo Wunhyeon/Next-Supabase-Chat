@@ -15,14 +15,14 @@ const ChatPresence = () => {
   useEffect(() => {
     const channel = supabase.channel("chat-room1");
 
-    console.log("ChatPresence - channel : ", channel);
+    // console.log("ChatPresence - channel : ", channel);
 
     channel
       .on("presence", { event: "sync" }, () => {
         // channel.presenceState()의 type은 '{ presence_ref: string; }'만 되어있기 때문에, 추가로 user_id도 타입으로 설정해준다.
         const newState: RealtimePresenceState<{ user_id: string }> =
           channel.presenceState();
-        console.log("sync : ", newState);
+        // console.log("sync : ", newState);
         const userIds = [];
         for (const item in newState) {
           const userId = newState[item][0].user_id;
@@ -31,7 +31,7 @@ const ChatPresence = () => {
           }
           userIds.push(userId);
         }
-        console.log("userIDs : ", userIds);
+        // console.log("userIDs : ", userIds);
 
         setOnlineUsers(new Set(userIds).size);
       })
